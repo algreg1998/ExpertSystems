@@ -218,15 +218,32 @@ public class Expert_Systems {
      public static String predict(String value){
         int x;
         double l=Math.log(probl+1),h=Math.log(probh+1);
+        int lo,hi;
         String [] words = value.split(" ");
         //for low
         
         for(x = 0;x<words.length;x++){
-            l+=(Math.log(getProbOfWord(words[x],"low")+1));
+            if(low.containsKey(words[x])){
+                lo = low.get(words[x]);
+            }else{
+                lo = 0;
+            }
+            if(high.containsKey(words[x])){
+                lo += high.get(words[x]);
+            }
+            l*=((getProbOfWord(words[x],"low")+1)/(lTotal+lo));
         } 
         //for high
         for(x = 0;x<words.length;x++){
-            h+=Math.log(getProbOfWord(words[x],"high")+1);
+            if(high.containsKey(words[x])){
+                hi = high.get(words[x]);
+            }else{
+                hi = 0;
+            }
+            if(low.containsKey(words[x])){
+                hi += low.get(words[x]);
+            }
+            h*=(getProbOfWord(words[x],"high")+1)/(hTotal+hi);
         } 
         System.out.print("low "+l+"-  high "+h+"  ");
         if(l>h){
