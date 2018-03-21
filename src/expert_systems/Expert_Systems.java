@@ -63,8 +63,8 @@ public class Expert_Systems {
             lTotal+=entry.getValue();
         }
         
-        probl = (double)lTotal/(lTotal+hTotal);
-        probh = (double)hTotal/(lTotal+hTotal);
+        probl = (double)(lTotal+1)/(lTotal+hTotal+2);
+        probh = (double)(hTotal+1)/(lTotal+hTotal+2);
         System.out.println(probl+"-"+probh);
         total = lTotal+hTotal;
         Map<String,Integer > hmap = sortByValues((HashMap)high); 
@@ -217,33 +217,35 @@ public class Expert_Systems {
      
      public static String predict(String value){
         int x;
-        double l=Math.log(probl+1),h=Math.log(probh+1);
+        double l=probl,h=probh;
         int lo,hi;
         String [] words = value.split(" ");
         //for low
         
         for(x = 0;x<words.length;x++){
-            if(low.containsKey(words[x])){
-                lo = low.get(words[x]);
-            }else{
-                lo = 0;
-            }
-            if(high.containsKey(words[x])){
-                lo += high.get(words[x]);
-            }
-            l*=((getProbOfWord(words[x],"low")+1)/(lTotal+lo));
+            l*=((getProbOfWord(words[x],"low")+1)/(lTotal+2));
+//            if(low.containsKey(words[x])){
+//                lo = low.get(words[x]);
+//            }else{
+//                lo = 0;
+//            }
+//            if(high.containsKey(words[x])){
+//                lo += high.get(words[x]);
+//            }
+//            l*=((getProbOfWord(words[x],"low")+1)/(lTotal+lo));
         } 
         //for high
         for(x = 0;x<words.length;x++){
-            if(high.containsKey(words[x])){
-                hi = high.get(words[x]);
-            }else{
-                hi = 0;
-            }
-            if(low.containsKey(words[x])){
-                hi += low.get(words[x]);
-            }
-            h*=(getProbOfWord(words[x],"high")+1)/(hTotal+hi);
+            h*=(getProbOfWord(words[x],"high")+1)/(hTotal+2);
+//            if(high.containsKey(words[x])){
+//                hi = high.get(words[x]);
+//            }else{
+//                hi = 0;
+//            }
+//            if(low.containsKey(words[x])){
+//                hi += low.get(words[x]);
+//            }
+//            h*=(getProbOfWord(words[x],"high")+1)/(hTotal+hi);
         } 
         System.out.print("low "+l+"-  high "+h+"  ");
         if(l>h){
@@ -260,15 +262,17 @@ public class Expert_Systems {
         double pWord=0, pR=0;  
         if(type == "low"){
             if(low.containsKey(word)){
-                pWord = (double)low.get(word)/total;
-                pR = (double)low.get(word)/probl;
-                return (pWord*pR)/ probl;   
+//                pWord = (double)low.get(word)/total;
+//                pR = (double)low.get(word)/probl;
+//                return (pWord*pR)/ probl;   
+                  return low.get(word);
             }
         }else if(type == "high"){
             if(high.containsKey(word)){
-                pWord = (double)high.get(word)/total;
-                pR = (double)high.get(word)/probh;
-                return (pWord*pR)/ probh;   
+//                pWord = (double)high.get(word)/total;
+//                pR = (double)high.get(word)/probh;
+//                return (pWord*pR)/ probh;   
+                return high.get(word);
             }
         }
         return 0.0;
