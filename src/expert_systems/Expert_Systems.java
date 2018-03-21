@@ -5,14 +5,10 @@
  */
 package expert_systems;
 
-import java.awt.Color;
+import java.text.Normalizer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -65,7 +61,7 @@ public class Expert_Systems {
         
         probl = (double)(lTotal+1)/(lTotal+hTotal+2);
         probh = (double)(hTotal+1)/(lTotal+hTotal+2);
-        System.out.println(probl+"-"+probh);
+//        System.out.println(probl+"-"+probh);
         total = lTotal+hTotal;
         Map<String,Integer > hmap = sortByValues((HashMap)high); 
         Map<String,Integer > lmap = sortByValues((HashMap)low); 
@@ -111,16 +107,16 @@ public class Expert_Systems {
                 
             }
         }
-        System.out.println("             LOW        ||      High");
-        System.out.println("LOW     |   "+aL+"      ||      "+aLN);
-        System.out.println("HIGH    |   "+aHN+"     ||      "+aH);
+        System.out.println("             HIGH        ||      LOW");
+        System.out.println("HIGH    |   "+aH+"      ||      "+aHN);
+        System.out.println("LOW     |   "+aLN+"     ||      "+aL);
         System.out.println("Accuracy: "+((float)(aL+aH)/(pL+pH)));
-        System.out.println("Misclassification Rate: "+((float)(aLN+aHN)/(pL+pH)));
-        System.out.println("True Positive Rate: "+((float)(aH)/(aHN + aH)));
-        System.out.println("False Positive Rate:  "+((float)(aLN)/(aLN + aL)));
-        System.out.println("Specificity: "+((float)(aL)/(aLN + aL)));
-        System.out.println("Precision: "+((float)(aH)/(aLN + aH)));
-        System.out.println("Prevalence: "+((float)(aHN+ aH)/(pL + pH)));
+//        System.out.println("Misclassification Rate: "+((float)(aLN+aHN)/(pL+pH)));
+//        System.out.println("True Positive Rate: "+((float)(aH)/(aHN + aH)));
+//        System.out.println("False Positive Rate:  "+((float)(aLN)/(aLN + aL)));
+//        System.out.println("Specificity: "+((float)(aL)/(aLN + aL)));
+//        System.out.println("Precision: "+((float)(aH)/(aLN + aH)));
+//        System.out.println("Prevalence: "+((float)(aHN+ aH)/(pL + pH)));
        
     }
     public static void displayFreqMatrix(Map<String,Integer > hmap,Map<String,Integer > lmap){
@@ -154,6 +150,7 @@ public class Expert_Systems {
                     if(low.containsKey(words[x])){
                         low.put(words[x].toLowerCase(), low.get(words[x])+1);
                     }else{
+                        words[x] = sanitize(words[x]);
                         low.put(words[x].toLowerCase(), 1);
                     }
                 }  
@@ -163,6 +160,7 @@ public class Expert_Systems {
                     if(high.containsKey(words[x])){
                         high.put(words[x].toLowerCase(), high.get(words[x])+1);
                     }else{
+                        words[x] = sanitize(words[x]);
                         high.put(words[x].toLowerCase(), 1);
                     }
                 }
@@ -217,13 +215,13 @@ public class Expert_Systems {
      
      public static String predict(String value){
         int x;
-        double l=probl,h=probh;
+        double l=Math.log(probl),h=Math.log(probh);
         int lo,hi;
         String [] words = value.split(" ");
         //for low
         
         for(x = 0;x<words.length;x++){
-            l*=((getProbOfWord(words[x],"low")+1)/(lTotal+2));
+            l+=Math.log((getProbOfWord(words[x],"low")+1)/(lTotal+total));
 //            if(low.containsKey(words[x])){
 //                lo = low.get(words[x]);
 //            }else{
@@ -236,7 +234,7 @@ public class Expert_Systems {
         } 
         //for high
         for(x = 0;x<words.length;x++){
-            h*=(getProbOfWord(words[x],"high")+1)/(hTotal+2);
+            h+=Math.log((getProbOfWord(words[x],"high")+1)/(hTotal+total));
 //            if(high.containsKey(words[x])){
 //                hi = high.get(words[x]);
 //            }else{
@@ -247,24 +245,24 @@ public class Expert_Systems {
 //            }
 //            h*=(getProbOfWord(words[x],"high")+1)/(hTotal+hi);
         } 
-        System.out.print("low "+l+"-  high "+h+"  ");
+        System.out.print("low "+l+" -  high "+h+"  ");
         if(l>h){
-            System.out.print(" decision low ");
+            System.out.print(" decision low ||  ");
             System.out.println(value);
             return "low";
         }else{
-            System.out.print(" decision high ");
+            System.out.print(" decision high || ");
             System.out.println(value);
             return "high";
         }
      }
      public static double getProbOfWord(String word,String type){
-        double pWord=0, pR=0;  
+        word = sanitize(word);
         if(type == "low"){
             if(low.containsKey(word)){
 //                pWord = (double)low.get(word)/total;
 //                pR = (double)low.get(word)/probl;
-//                return (pWord*pR)/ probl;   
+//                return (pWord*pR)/ probl;  
                   return low.get(word);
             }
         }else if(type == "high"){
@@ -277,6 +275,16 @@ public class Expert_Systems {
         }
         return 0.0;
      }
-    
+     public static String sanitize(String word){
+         return flattenToAscii(word.replaceAll("[^a-zA-Z0-9]",""));
+     }
+    public static String flattenToAscii(String string) {
+        StringBuilder sb = new StringBuilder(string.length());
+        string = Normalizer.normalize(string, Normalizer.Form.NFD);
+        for (char c : string.toCharArray()) {
+            if (c <= '\u007F') sb.append(c);
+        }
+        return sb.toString();
+    }
     
 }
