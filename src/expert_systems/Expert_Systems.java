@@ -121,7 +121,7 @@ public class Expert_Systems {
         System.out.println("Specificity: "+((float)(aL)/(aLN + aL)));
         System.out.println("Precision: "+((float)(aH)/(aLN + aH)));
         System.out.println("Prevalence: "+((float)(aHN+ aH)/(pL + pH)));
-        
+       
     }
     public static void displayFreqMatrix(Map<String,Integer > hmap,Map<String,Integer > lmap){
         for(Map.Entry<String, Integer> entry : hmap.entrySet()) {
@@ -215,24 +215,27 @@ public class Expert_Systems {
          }
      }
      
-     private static String predict(String value){
+     public static String predict(String value){
         int x;
         double l=Math.log(probl+1),h=Math.log(probh+1);
         String [] words = value.split(" ");
         //for low
         
         for(x = 0;x<words.length;x++){
-            l+=Math.log(getProbOfWord(words[x],"low")+1);
+            l+=(Math.log(getProbOfWord(words[x],"low")+1));
         } 
         //for high
         for(x = 0;x<words.length;x++){
             h+=Math.log(getProbOfWord(words[x],"high")+1);
         } 
         System.out.print("low "+l+"-  high "+h+"  ");
-        System.out.println(value);
         if(l>h){
+            System.out.print(" decision low ");
+            System.out.println(value);
             return "low";
         }else{
+            System.out.print(" decision high ");
+            System.out.println(value);
             return "high";
         }
      }
